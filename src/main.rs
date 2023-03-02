@@ -1,6 +1,11 @@
 use std::sync::{Arc, Mutex};
 
-use axum::{extract::State, response::IntoResponse, routing::get, Json, Router, Server};
+use axum::{
+    extract::State,
+    response::{Html, IntoResponse},
+    routing::get,
+    Json, Router, Server,
+};
 use sysinfo::{CpuExt, System, SystemExt};
 
 #[tokio::main]
@@ -24,15 +29,17 @@ struct AppState {
     sys: Arc<Mutex<System>>, // System information structure. It is wrapped in a Mutex to allow it to be shared between threads.
 }
 
-async fn root_get() -> &'static str {
-    // This function will be called when the route "/" is matched.
-    "Yosh ! "
+#[axum::debug_handler]
+async fn root_get() -> impl IntoResponse {
+    let markup = tokio::fs::read_to_string("src/index.html").await.unwrap(); // Reading the index.html file.
+
+    Html(markup) // Returning the index.html file.
 }
 
 #[axum::debug_handler]
 async fn cpus_get(State(state): State<AppState>) -> impl IntoResponse {
     let mut sys = state.sys.lock().unwrap(); // Getting the System information structure from the state. It is wrapped in a Mutex to allow it to be shared between threads.
-                                             // First we update all information of our `System` struct.
+
     sys.refresh_cpu(); // Refreshing CPU information.
 
     let v: Vec<_> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect(); // Getting the CPU usage. It is a value between 0 and 100.
