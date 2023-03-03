@@ -1,3 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
-  document.body.textContent = "Hello World!";
+  let i = 0;
+
+  setInterval(() => {
+    i = i + 1;
+    document.body.textContent = `cycle ${i}`;
+  }, 1000);
 });
