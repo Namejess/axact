@@ -13,7 +13,7 @@ use sysinfo::{CpuExt, System, SystemExt};
 async fn main() {
     let router = Router::new() // Creating the router. It is a tree of routes. Each route is a function that will be called when the route is matched.
         .route("/", get(root_get)) // Adding a route. The first argument is the path. The second argument is the function that will be called when the route is matched.
-        .route("/index.js", get(indexjs_get))
+        .route("/index.mjs", get(indexmjs_get))
         .route("/api/cpus", get(cpus_get))
         .with_state(AppState {
             // Adding the state to the router. This state will be available to all routes. It is wrapped in an Arc to allow it to be shared between threads.
@@ -39,8 +39,8 @@ async fn root_get() -> impl IntoResponse {
 }
 
 #[axum::debug_handler]
-async fn indexjs_get() -> impl IntoResponse {
-    let markup = tokio::fs::read_to_string("src/index.js").await.unwrap(); // Reading the index.js file.
+async fn indexmjs_get() -> impl IntoResponse {
+    let markup = tokio::fs::read_to_string("src/index.mjs").await.unwrap(); // Reading the index.js file.
 
     Response::builder() // Creating the response.
         .header("content-type", "application/javascript;charset=utf-8")
